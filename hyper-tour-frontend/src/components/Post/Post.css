@@ -1,0 +1,37 @@
+#post{
+    padding: 0px 5px;
+}
+
+.post-image {
+    border-radius: 30px;
+}
+
+.post-info {
+    margin: 0px 10px;
+    margin-bottom: 20px;
+}
+
+.post-user {
+    margin-left: 13px;
+    cursor: pointer;
+}
+
+.like-btn {
+    margin-left: 80px;
+    cursor: pointer;
+}
+
+.like-count {
+    margin-left: 3px;
+    cursor: pointer;
+}
+
+.comment-btn {
+    margin-left: 11px;
+    cursor: pointer;
+}
+
+.comment-count {
+    margin-left: 3px;
+    cursor: pointer;
+}

@@ -1,18 +1,30 @@
+::-webkit-scrollbar {
+    width: 0px;
+}
+
 #inf-scroll {
     height: 100vh;
     background-color: #3C3F51;
     border-radius: 50px 0px 0px 50px;
+    padding-left: 70px;
+    padding-right: 40px;
+    padding-top: 20px;
 }
 
 #profile-view {
     top: 60vh;
     position: absolute;
     background-color: #3C3F51;
-    left: 23vw;
+    left: 352px;
     padding: 10px 4px;
     cursor: pointer;
     border-radius: 15px 0px 0px 15px;
 }
 #profile-view:hover {
     background-color: #E2336B;
+}
+
+#parent-posts {
+    height: 85vh;
+    overflow: auto;
 }
