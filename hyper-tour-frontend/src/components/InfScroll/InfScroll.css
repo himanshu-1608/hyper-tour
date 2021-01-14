@@ -1,0 +1,18 @@
+#inf-scroll {
+    height: 100vh;
+    background-color: #3C3F51;
+    border-radius: 50px 0px 0px 50px;
+}
+
+#profile-view {
+    top: 60vh;
+    position: absolute;
+    background-color: #3C3F51;
+    left: 23vw;
+    padding: 10px 4px;
+    cursor: pointer;
+    border-radius: 15px 0px 0px 15px;
+}
+#profile-view:hover {
+    background-color: #E2336B;
+}
