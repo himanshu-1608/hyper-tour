@@ -1,0 +1,13 @@
+#sugg-list {
+    height: 100vh;
+    background-color: #3C3F51;
+    border-radius: 50px 0px 0px 50px;
+    padding-left: 70px;
+    padding-right: 40px;
+    padding-top: 20px;
+}
+
+#list-header {
+    height: 85vh;
+    overflow: auto;
+}

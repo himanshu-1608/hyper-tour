@@ -1,0 +1,25 @@
+.user-card {
+    margin-top: 30px;
+    margin-right: 30px;
+    border-radius: 10px;
+    border: 1px solid grey;
+}
+
+.user-card-img {
+    margin-top: 30px;
+    border: 2px solid black;
+}
+
+.add-friend-btn {
+    margin-bottom: 30px;
+    border: 1px solid grey;
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+.added-div {
+    margin-bottom: 30px;
+    border: 1px solid grey;
+    padding: 2px 10px;
+    border-radius: 8px;
+}
