@@ -32,7 +32,7 @@ const PostModal = (props) =>{
                     </div>
                 </div>
                 <div className="center-align">
-                    <img src="https://source.unsplash.com/random/?tree" id="modal-post-img" alt="modal post"/>
+                    <img src="https://qphs.fs.quoracdn.net/main-qimg-f521020f4e9761f812d1dd8e1de32ebb-c" id="modal-post-img" alt="modal post"/>
                 </div>
                 <div id="modal-like-status">
                     <i className="material-icons pink-text left">favorite</i>
