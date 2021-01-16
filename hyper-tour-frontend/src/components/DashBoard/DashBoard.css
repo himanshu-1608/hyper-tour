@@ -51,6 +51,7 @@
     font-size: 15px;
     color: grey;
     cursor: pointer;
+    border-radius: 10px;
 }
 
 #triggers>div>i {
@@ -60,7 +61,6 @@
 #triggers>div:hover {
     color: white;
     background-color: #666666;
-    border-radius: 10px;
 }
 
 #horizontal-divider {
