@@ -73,7 +73,6 @@ const DashBoard = (props) => {
             });
             if(response.ok) {
               const responseData = await response.json();
-              console.log(responseData);
               setUserName(responseData.user.name);
               setUserImage(responseData.user.image);
               setUserPosts(responseData.user.posts);
@@ -85,7 +84,7 @@ const DashBoard = (props) => {
             }
         }
         findUserData();    
-    },[]);
+    },[props.stateChanged]);
 
     return (
         <div id="dash-board" className={`col l3`}>

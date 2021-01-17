@@ -28,7 +28,7 @@ const getUser = async(req, res, next) => {
     });
 };
 
-const changeFriendStatus = async(req, res, next) => {
+const changeFollowingStatus = async(req, res, next) => {
     const myId = req.userData.userId;
     const { friendId, decision } = req.body;
     let user, friend;
@@ -48,17 +48,25 @@ const changeFriendStatus = async(req, res, next) => {
         return next(error);
     }
 
-    const isFriend = user.friends.find(id => id === friendId);
+    const isFriend = user.following.find(followingId => followingId == friendId);
 
     try {
-        if (decision === "add" && !isFriend) {
-            user.friends.push(friend);
-            await user.save();
-            res.json({ message: "Added Friend" });
-        } else if(decision === "remove" && isFriend) {   
-            user.friends.pull(friend);
-            await user.save();
-            res.json({ message: "Removed Friend" });
+        if (decision === "add") {
+            if(!isFriend) {
+                user.following.push(friend);
+                friend.followers.push(user);
+                await user.save();
+                await friend.save();
+            }
+            res.json({ message: "Added in Followings" });
+        } else if(decision === "remove") {   
+            if(isFriend) {
+                user.following.pull(friend);
+                friend.followers.pull(user);
+                await user.save();
+                await friend.save();
+            }
+            res.json({ message: "Removed from Followings" });
         }
     } catch(e) {
         const error = new HttpError(
@@ -69,7 +77,7 @@ const changeFriendStatus = async(req, res, next) => {
     }
 };
 
-const checkFriendStatus = async(req, res, next) => {
+const checkFollowingStatus = async(req, res, next) => {
     const myId = req.userData.userId;
     const { friendId } = req.body;
     let user;
@@ -102,33 +110,25 @@ const checkFriendStatus = async(req, res, next) => {
 
 const getSuggestions = async(req, res, next) => {
     const myId = req.userData.userId;
-    let user, allList, suggestions = [];
+    let user, allList;
     try {
-        user = await User.findById(myId).populate('friends');
-        allList = await User.find().limit(10);
+        user = await User.findById(myId);
+        allList = await User.find().limit(20);
         
-        if (!user) {
+        if (!user || !allList) {
             const error = new HttpError(
-                'Could not find given user for the provided id.',
+                'Could not find given user or suggestions for the provided id.',
                 404
             );
             return next(error);
         }
-        // for (recommend of allList) {
-        //     if (recommend.id === user.id) {
-        //         continue;
-        //     }
-        //     isFriend = false;
-        //     for (friendUser of user.friends) {
-        //         if (recommend.id === friendUser.id) {
-        //             isFriend = true;
-        //         }
-        //     }
-        //     if (!isFriend) {
-        //         suggestions.push(recommend);
-        //     }
-        // }
-        res.status(200).json({ suggestedUsers: suggestions });
+        
+        const suggestions = allList.filter(recommendedUser => {
+            return (recommendedUser._id != myId) &&
+            !(user.following.find(following => following._id == recommendedUser._id.toString())); 
+        });
+
+        res.status(200).json(suggestions);
     } catch (err) {
         const error = new HttpError(
             'Something went wrong, could not find the user.',
@@ -139,6 +139,6 @@ const getSuggestions = async(req, res, next) => {
 };
 
 exports.getUser = getUser;
-exports.changeFriendStatus = changeFriendStatus;
-exports.checkFriendStatus = checkFriendStatus;
+exports.changeFollowingStatus = changeFollowingStatus;
+exports.checkFollowingStatus = checkFollowingStatus;
 exports.getSuggestions = getSuggestions;

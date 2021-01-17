@@ -52,8 +52,8 @@ const UploadImage = (props) => {
                         body: formData
                     });
             responseData = await response.json();
-            console.log(responseData);
             setUploadUrl(responseData.imgLink);
+            props.updateDashBoard();
             setPosted(true);
         } catch(e) {
             console.log("Error occured: "+ e);

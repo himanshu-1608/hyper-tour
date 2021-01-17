@@ -1,22 +1,43 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
 import './UserCard.css';
+import AuthContext from '../../context/auth-context';
 
 const UserCard = (props) => {
     
+    const auth = useContext(AuthContext);
     const [isFriend, setIsFriend] = useState(false);
+    const[authError, setAuthError] = useState('');
 
-    const addFriend = (index)=> {
-        setIsFriend(true);
-        props.addFriend(index);
+    let response, responseData;
+    const addFriend = async(friendId)=> {
+        console.log(friendId);
+        response = await fetch(`http://localhost:5000/api/users/following/change`,{
+            method: "POST",
+            headers:{
+                authorization: `Bearer ${auth.token}`,
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({
+                friendId: friendId,
+                decision: "add"
+            })
+        });
+        if(response.ok) {
+            responseData = await response.json();
+            setIsFriend(true);
+            props.addFriend();
+        } else {
+            responseData = await response.json();
+            setAuthError(responseData.message);
+        }
     }
     return (
     <div className="col l2 user-card center-align">
-        <img src="https://raw.githubusercontent.com/himanshu-1608/hello-world/master/IMG_20200607_225558.jpg" className="circle user-card-img" alt="suggestion" width="130px"/>
-        
-        <h6 className="white-text">himanshu-1608</h6>
+        <img src={props.suggestionImage} className="circle user-card-img" alt="suggestion" width="130px"/>
+        <h6 className="white-text">{props.suggestionName}</h6>
         {!isFriend &&
-        <button onClick={()=>{addFriend(props.index)}} className="add-friend-btn grey">Add Friend</button>
+        <button onClick={()=>{addFriend(props.suggestionId)}} className="add-friend-btn grey">Add Friend</button>
         }
         {isFriend &&
         <div className="container light-green added-div">Added :)</div>

@@ -34,8 +34,8 @@ const PostModal = (props) =>{
         if(response.ok) {
             setCurrComment('');
             responseData = await response.json();
-            console.log(responseData);
             setCommentAdded(!commentAdded);
+            props.changeComment();
         } else {
             responseData = await response.json();
             setAuthError(responseData.message);
@@ -51,7 +51,6 @@ const PostModal = (props) =>{
             });
             if(response.ok) {
                 responseData = await response.json();
-                console.log(responseData);
                 setImage(responseData.image);
                 setAuthorImg(responseData.creator.image);
                 setAuthor(responseData.creator.name);

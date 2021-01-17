@@ -9,7 +9,7 @@ const Post = (props) =>{
     const auth = useContext(AuthContext);
 
     const [isLiked, setIsLiked] = 
-                    useState(props.postLikers.find(liker=> liker.name == auth.userName));
+                    useState(props.postLikers.find(liker=> liker.name === auth.userName));
     const [authError, setAuthError] = useState('');
 
     let response, responseData;
@@ -28,7 +28,6 @@ const Post = (props) =>{
         if(response.ok) {
             setIsLiked(true);
             responseData = await response.json();
-            console.log(responseData);
             props.changeLike();
         } else {
             responseData = await response.json();
@@ -51,7 +50,6 @@ const Post = (props) =>{
         if(response.ok) {
             setIsLiked(false);
             responseData = await response.json();
-            console.log(responseData);
             props.changeLike();
         } else {
             responseData = await response.json();

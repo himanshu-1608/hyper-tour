@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.use(checkAuth);
 
-router.post('/friends/change', usersController.changeFriendStatus);
-router.post('/friends/check', usersController.checkFriendStatus);
+router.post('/following/change', usersController.changeFollowingStatus);
+router.post('/friends/check', usersController.checkFollowingStatus);
 
 router.get('/friends/suggestion', usersController.getSuggestions);
 router.get('/:uname', usersController.getUser);

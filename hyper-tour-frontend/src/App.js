@@ -21,6 +21,7 @@ function App() {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [token, setToken] = useState();
   const [userName, setUserName] = useState();
+  const [stateChanged, setStateChanged] = useState(false);
 
   let checkToken, checkUserName;
   useEffect(() => {
@@ -47,6 +48,10 @@ function App() {
     setLoggedIn(false);
   },[]);
   
+  const updateDashBoard = () => {
+    setStateChanged(!stateChanged);
+  }
+
   const unauthenticatedRoutes = (
     <Switch>
       <Route path="/auth">
@@ -62,10 +67,10 @@ function App() {
           <InfScroll />
         </Route>
         <Route path="/upload" exact>
-          <UploadPost />
+          <UploadPost updateDashBoard={updateDashBoard}/>
         </Route>
         <Route path="/suggestions" exact>
-          <SuggestionList />
+          <SuggestionList updateDashBoard={updateDashBoard}/>
         </Route>
         <Route path="/settings" exact>
           <ProfileSetting />
@@ -85,7 +90,7 @@ function App() {
         {!isLoggedIn && (unauthenticatedRoutes)}
         {isLoggedIn && (
           <div id="app" className="row">
-            <DashBoard logout={logout}/>
+            <DashBoard stateChanged={stateChanged} logout={logout}/>
             {authenticatedRoutes}
           </div>
         )}
