@@ -1,13 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 
 import './InfScroll.css';
 import Post from '../Post/Post';
 import PostModal from '../PostModal/PostModal';
+import AuthContext from '../../context/auth-context';
 
 const InfScroll = (props) => {
 
+    const auth = useContext(AuthContext);
     const [isRendered, setRendered] = useState(false);
     const [isModalOpen, setModalOpen] = useState(false);
+    const [currPost, setCurrPost] = useState('');
 
     const [posts1, setPost1] = useState();
     const [posts2, setPost2] = useState();
@@ -15,18 +18,24 @@ const InfScroll = (props) => {
     
     
     const openModal = (postId) => {
+        setCurrPost(postId);
         setModalOpen(true);
     };
 
     const closeModal = () => {
+        setCurrPost('');
         setModalOpen(false);
     };
+
+    const changeLike = () => {
+        doWork();
+    }
 
     const doWork = useCallback(async () => {
         response = await fetch(`http://localhost:5000/api/posts/all`,{
             method: "GET",
             headers: {
-              authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MDAzZTFkZWY5NTA1MjEzZTRmYzBlNTkiLCJlbWFpbCI6Im9uZUBnbWFpbC5jb20iLCJpYXQiOjE2MTA4NjcxNjZ9.yvpXZlZoo30f3Z5OIxt77nPQwIKn5Sxh3CsA970t_E8'
+              authorization: `Bearer ${auth.token}`
             }
         });
         responseData = await response.json();
@@ -35,16 +44,16 @@ const InfScroll = (props) => {
             responseData.map((postData, i) => {
                 switch(i%3) {
                     case 0: p1.push(
-                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        <Post key={i} postId={postData._id} changeLike={changeLike} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
                         break;
                     case 1: p2.push(
-                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        <Post key={i} postId={postData._id} changeLike={changeLike} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
                         break;
                     case 2: p3.push(
-                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        <Post key={i} postId={postData._id} changeLike={changeLike} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
                         break;
                     default: p1.push(
-                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        <Post key={i} postId={postData._id} changeLike={changeLike} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
                         break;
                 }
             });
@@ -77,7 +86,7 @@ const InfScroll = (props) => {
             </div>
             }
             {isModalOpen &&
-            <PostModal closeModal={closeModal}/>
+            <PostModal postId={currPost} closeModal={closeModal}/>
             }
         </div>
     )

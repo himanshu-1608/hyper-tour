@@ -14,4 +14,6 @@ router.post('/create', fileUpload.single('image'), postsController.createPost);
 router.post('/like', postsController.changeLikeStatus);
 router.post('/addComment', postsController.addCommentToPost);
 
+router.get('/:pid', postsController.getCurrentPost);
+
 module.exports = router;

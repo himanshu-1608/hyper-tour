@@ -106,8 +106,7 @@ const getSuggestions = async(req, res, next) => {
     try {
         user = await User.findById(myId).populate('friends');
         allList = await User.find().limit(10);
-        console.log(user);
-        console.log(allList);
+        
         if (!user) {
             const error = new HttpError(
                 'Could not find given user for the provided id.',

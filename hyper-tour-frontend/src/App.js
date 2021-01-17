@@ -34,17 +34,17 @@ function App() {
   const login = useCallback((token, userName) => {
     localStorage.setItem('userToken', token);
     localStorage.setItem('userName', userName);
-    setLoggedIn(true);
-    setToken(token);
     setUserName(userName);
+    setToken(token);
+    setLoggedIn(true);
   },[]);
 
   const logout = useCallback(() => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userName');
+    setToken('');
+    setUserName('');
     setLoggedIn(false);
-    setToken();
-    setUserName();
   },[]);
   
   const unauthenticatedRoutes = (

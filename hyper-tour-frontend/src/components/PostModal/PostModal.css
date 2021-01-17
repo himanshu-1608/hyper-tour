@@ -12,7 +12,7 @@
 }
 
 #modal-like-status {
-    margin: 0px 180px;
+    margin: 0px 210px;
 }
 
 #modal-content {
@@ -20,7 +20,7 @@
     margin: auto;
     border-radius: 40px;
     padding: 20px;
-    width: 45%;
+    width: 40%;
 }
 
 .close {
@@ -37,6 +37,7 @@
 
 #modal-post-creator {
     margin: 0px;
+    margin-left: 10px;
 }
 
 #modal-post-img {
@@ -46,7 +47,7 @@
 
 .modal-comments {
     background-color: #282A34;
-    margin: 10px 50px;
+    margin: 6px 30px;
     border-radius: 10px;
     padding: 2px 0px;
     padding-left: 20px;
