@@ -98,7 +98,7 @@ const DashBoard = (props) => {
                 <circle cx="180" cy="70" r="56" stroke="grey" strokeWidth="2" /> Unsupported SVGs
             </svg> 
             <div className="center-align">
-                <img src={userImage} className="circle" id="user-img" width="100px" alt="user"/>
+                <img src={`http://localhost:5000/${userImage}`} className="circle" id="user-img" width="100px" alt="user"/>
             </div>
             <div className="center-align white-text" id="user-full-name">
                 <strong>@{userName}</strong>

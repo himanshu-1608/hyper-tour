@@ -40,7 +40,6 @@ const UploadImage = (props) => {
     let response, responseData;
     const submitPostHandler = async(e) => {
         e.preventDefault();
-        console.log("working front");
         const formData = new FormData();
         formData.append('image', file);
         try{
@@ -56,7 +55,7 @@ const UploadImage = (props) => {
             props.updateDashBoard();
             setPosted(true);
         } catch(e) {
-            console.log("Error occured: "+ e);
+            console.log(e);
         }
     };
 

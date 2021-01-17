@@ -11,7 +11,6 @@ const UserCard = (props) => {
 
     let response, responseData;
     const addFriend = async(friendId)=> {
-        console.log(friendId);
         response = await fetch(`http://localhost:5000/api/users/following/change`,{
             method: "POST",
             headers:{
@@ -34,7 +33,7 @@ const UserCard = (props) => {
     }
     return (
     <div className="col l2 user-card center-align">
-        <img src={props.suggestionImage} className="circle user-card-img" alt="suggestion" width="130px"/>
+        <img src={`http://localhost:5000/${props.suggestionImage}`} className="circle user-card-img" alt="suggestion" width="130px"/>
         <h6 className="white-text">{props.suggestionName}</h6>
         {!isFriend &&
         <button onClick={()=>{addFriend(props.suggestionId)}} className="add-friend-btn grey">Add Friend</button>

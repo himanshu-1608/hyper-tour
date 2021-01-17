@@ -1,3 +1,6 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const {secret, times} = require('../config');
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
@@ -138,7 +141,70 @@ const getSuggestions = async(req, res, next) => {
     }
 };
 
+const updateImage = async(req, res, next) => {
+    let user;
+    try {
+        user = await User.findById(req.userData.userId);
+        user.image = req.file.path
+        await user.save();
+        res.status(201).json({message: "Image Updated"});
+    } catch (err) {
+        const error = new HttpError(
+            'Image updation failed, please try again.',
+            500
+        );
+        return next(error);
+    }
+};
+
+const updatePassword = async(req, res, next) => {
+    let user;
+    const { oldPassword, newPassword } = req.body;
+    let isValidPassword;
+    try {
+        user = await User.findById(req.userData.userId);
+        isValidPassword = await bcrypt.compare(
+            oldPassword, user.password);
+    } catch (err) {
+        const error = new HttpError(
+            'Password updation failed, please try again.',
+            500
+        );
+        return next(error);
+    }
+    if (!isValidPassword) {
+        const error = new HttpError(
+            'Invalid credentials, could not log you in.',
+            403
+        );
+        return next(error);
+    }
+    let hashedPassword;
+    try {
+        hashedPassword = await bcrypt.hash(newPassword, times);
+    } catch (err) {
+        const error = new HttpError(
+            'Password updation failed, please try again.',
+            500
+        );
+        return next(error);
+    }
+    try{
+        user.password = hashedPassword;
+        await user.save();
+        res.status(201).json({message: "Password Updated"});
+    } catch(err) {
+        const error = new HttpError(
+            'Could not update password, please try again.',
+            500
+        );
+        return next(error);
+    }
+};
+
 exports.getUser = getUser;
 exports.changeFollowingStatus = changeFollowingStatus;
 exports.checkFollowingStatus = checkFollowingStatus;
 exports.getSuggestions = getSuggestions;
+exports.updateImage = updateImage;
+exports.updatePassword = updatePassword;

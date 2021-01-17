@@ -42,7 +42,7 @@ const signup = async(req, res, next) => {
         name,
         email,
         password: hashedPassword,
-        image: 'https://cdn.auth0.com/blog/react-js/react.png',
+        image: 'uploads/images/new-user.png',
         following: [],
         followers: [],
         posts: []

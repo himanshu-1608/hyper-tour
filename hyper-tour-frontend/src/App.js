@@ -73,7 +73,7 @@ function App() {
           <SuggestionList updateDashBoard={updateDashBoard}/>
         </Route>
         <Route path="/settings" exact>
-          <ProfileSetting />
+          <ProfileSetting updateDashBoard={updateDashBoard}/>
         </Route>
         <Redirect to="/" />
       </Switch>
