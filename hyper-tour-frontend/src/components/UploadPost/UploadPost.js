@@ -2,13 +2,16 @@ import React, { useEffect, useRef, useState, useContext } from 'react';
 
 import './UploadPost.css';
 
+import AuthContext from '../../context/auth-context';
+
 const UploadImage = (props) => {
 
-    // const auth = useContext(AuthContext);
+    const auth = useContext(AuthContext);
     const filePickerRef = useRef();
     const [file, setFile] = useState();
-    const [previewUrl, setPreviewUrl] = useState();
+    const [previewUrl, setPreviewUrl] = useState('');
     const [posted, setPosted] = useState(false);
+    const [uploadUrl, setUploadUrl] = useState('');
 
     useEffect(()=> {
         if(!file) {
@@ -34,18 +37,36 @@ const UploadImage = (props) => {
         filePickerRef.current.click();
     };
 
+    let response, responseData;
     const submitPostHandler = async(e) => {
         e.preventDefault();
-        let postData;
+        console.log("working front");
         const formData = new FormData();
         formData.append('image', file);
-        setPosted(true);
+        try{
+            response = await fetch('http://localhost:5000/api/posts/create',{
+                        method: 'POST',
+                        headers: { 
+                        authorization: `Bearer ${auth.token}`
+                        },
+                        body: formData
+                    });
+            responseData = await response.json();
+            console.log(responseData);
+            setUploadUrl(responseData.imgLink);
+            setPosted(true);
+        } catch(e) {
+            console.log("Error occured: "+ e);
+        }
     };
 
     return (
         <div id="upload-post" className={`col l9`}>
         {posted && 
-        <h3 className="center-align yellow-text">Post Created Successfully!!! <br />Watch your post <a className="pink-text" href={`/profile/himanshu-1608`}>here</a></h3>
+            <div className="center-align">
+                <h3 className="orange-text">Post Created Successfully!!!</h3>
+                <img  style={{maxWidth: "550px", maxHeight: "500px"}} src={`http://localhost:5000/${uploadUrl}`} />
+            </div>
         }
         {!posted &&
         <form onSubmit={submitPostHandler}>

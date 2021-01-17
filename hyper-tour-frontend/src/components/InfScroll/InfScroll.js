@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import './InfScroll.css';
 import Post from '../Post/Post';
@@ -22,25 +22,42 @@ const InfScroll = (props) => {
         setModalOpen(false);
     };
 
-    useEffect(()=>{
-        let p1 = [], p2 = [], p3 = [];
-        for(let i=1;i<14;i++) {
-            if(i%3===0) {
-                p1.push(<Post key={i} postId={`post${i}`} openPost={openModal} imgLink={`https://source.unsplash.com/random/?${i}`}
-                    />);
-            } else if(i%3===1) {
-                p2.push(<Post key={i} postId={`post${i}`} openPost={openModal} imgLink={`https://source.unsplash.com/random/?${i}`}
-                    />);
-            } else {
-                p3.push(<Post key={i} postId={`post${i}`} openPost={openModal} imgLink={`https://source.unsplash.com/random/?${i}`}
-                    />);
+    const doWork = useCallback(async () => {
+        response = await fetch(`http://localhost:5000/api/posts/all`,{
+            method: "GET",
+            headers: {
+              authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MDAzZTFkZWY5NTA1MjEzZTRmYzBlNTkiLCJlbWFpbCI6Im9uZUBnbWFpbC5jb20iLCJpYXQiOjE2MTA4NjcxNjZ9.yvpXZlZoo30f3Z5OIxt77nPQwIKn5Sxh3CsA970t_E8'
             }
+        });
+        responseData = await response.json();
+        if(responseData && responseData.length>0) {
+            let p1 = [], p2 = [], p3 = [];
+            responseData.map((postData, i) => {
+                switch(i%3) {
+                    case 0: p1.push(
+                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        break;
+                    case 1: p2.push(
+                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        break;
+                    case 2: p3.push(
+                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        break;
+                    default: p1.push(
+                        <Post key={i} postId={postData.id} openPost={openModal} postLikers={postData.likers} postComments={postData.comments} imgLink={postData.image} creator={postData.creator.name} />);
+                        break;
+                }
+            });
+            setPost1(p1);
+            setPost2(p2);
+            setPost3(p3);
         }
-        setPost1(p1);
-        setPost2(p2);
-        setPost3(p3);
-
         setRendered(true);
+    },[]);
+
+    let response, responseData;
+    useEffect(()=> {
+        doWork();
     },[]);
 
     return (

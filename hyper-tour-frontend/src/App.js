@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { 
   BrowserRouter as Router,
   Route, 
@@ -14,14 +14,39 @@ import InfScroll from './components/InfScroll/InfScroll';
 import UploadPost from './components/UploadPost/UploadPost';
 import SuggestionList from './components/SuggestionList/SuggestionList';
 import ProfileSetting from './components/ProfileSetting/ProfileSetting';
+import AuthContext from './context/auth-context';
 
 function App() {
   
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [token, setToken] = useState();
+  const [userName, setUserName] = useState();
 
-  const logout = () => {
+  let checkToken, checkUserName;
+  useEffect(() => {
+    checkToken = localStorage.getItem('userToken');
+    checkUserName = localStorage.getItem('userName');
+    if(checkToken && checkToken.length > 0) {
+      login(checkToken, checkUserName);
+    }
+  },[]);
+
+  const login = useCallback((token, userName) => {
+    localStorage.setItem('userToken', token);
+    localStorage.setItem('userName', userName);
+    setLoggedIn(true);
+    setToken(token);
+    setUserName(userName);
+  },[]);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userName');
     setLoggedIn(false);
-  }
+    setToken();
+    setUserName();
+  },[]);
+  
   const unauthenticatedRoutes = (
     <Switch>
       <Route path="/auth">
@@ -50,15 +75,22 @@ function App() {
   );
 
   return (
-    <Router>
-      {!loggedIn && (unauthenticatedRoutes)}
-      {loggedIn && (
-        <div id="app" className="row">
-          <DashBoard logout={logout}/>
-          {authenticatedRoutes}
-        </div>
-      )}
-    </Router>
+    <AuthContext.Provider value={{
+      isLoggedIn: isLoggedIn,
+      login: login,
+      logout: logout,
+      token: token,
+      userName: userName}}>
+      <Router>
+        {!isLoggedIn && (unauthenticatedRoutes)}
+        {isLoggedIn && (
+          <div id="app" className="row">
+            <DashBoard logout={logout}/>
+            {authenticatedRoutes}
+          </div>
+        )}
+      </Router>
+    </AuthContext.Provider>
   );
 }
 

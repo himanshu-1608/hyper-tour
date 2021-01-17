@@ -1,12 +1,13 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const {secret, times} = require('../config');
 
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 
 const signup = async(req, res, next) => {
+    
     const { name, email, password } = req.body;
-
     let existingUser;
     try {
         existingUser = await User.findOne({ email: email });
@@ -28,7 +29,7 @@ const signup = async(req, res, next) => {
 
     let hashedPassword;
     try {
-        hashedPassword = await bcrypt.hash(password, 12);
+        hashedPassword = await bcrypt.hash(password, times);
     } catch (err) {
         const error = new HttpError(
             'Could not create user, please try again.',
@@ -42,7 +43,8 @@ const signup = async(req, res, next) => {
         email,
         password: hashedPassword,
         image: 'https://cdn.auth0.com/blog/react-js/react.png',
-        friends: [],
+        following: [],
+        followers: [],
         posts: []
     });
 
@@ -58,9 +60,10 @@ const signup = async(req, res, next) => {
 
     let token;
     try {
-        token = jwt.sign({ userId: createdUser.id, email: createdUser.email },
-            'secret_key', { expiresIn: 60000000 }
-        );
+        token = jwt.sign({
+            userId: createdUser.id,
+            email: createdUser.email
+        },secret);
     } catch (err) {
         const error = new HttpError(
             'Signing up failed, please try again later.',
@@ -69,9 +72,7 @@ const signup = async(req, res, next) => {
         return next(error);
     }
 
-    res
-        .status(201)
-        .json({
+    res.status(201).json({
             userId: createdUser.id,
             email: createdUser.email,
             token: token,
@@ -80,10 +81,10 @@ const signup = async(req, res, next) => {
 };
 
 const login = async(req, res, next) => {
+    
     const { email, password } = req.body;
 
     let existingUser;
-
     try {
         existingUser = await User.findOne({ email: email });
     } catch (err) {
@@ -102,12 +103,13 @@ const login = async(req, res, next) => {
         return next(error);
     }
 
-    let isValidPassword = false;
+    let isValidPassword;
     try {
-        isValidPassword = await bcrypt.compare(password, existingUser.password);
+        isValidPassword = await bcrypt.compare(
+            password, existingUser.password);
     } catch (err) {
         const error = new HttpError(
-            'Could not log you in, please check your credentials and try again.',
+            'Could not log you in, please try again.',
             500
         );
         return next(error);
@@ -123,9 +125,10 @@ const login = async(req, res, next) => {
 
     let token;
     try {
-        token = jwt.sign({ userId: existingUser.id, email: existingUser.email },
-            'secret_key', { expiresIn: 60000000 }
-        );
+        token = jwt.sign({
+            userId: existingUser.id,
+            email: existingUser.email
+        }, secret);
     } catch (err) {
         const error = new HttpError(
             'Logging in failed, please try again later.',
@@ -134,11 +137,11 @@ const login = async(req, res, next) => {
         return next(error);
     }
 
-    res.json({
+    res.status(200).json({
         userId: existingUser.id,
         email: existingUser.email,
+        token: token,
         userName: existingUser.name,
-        token: token
     });
 };
 

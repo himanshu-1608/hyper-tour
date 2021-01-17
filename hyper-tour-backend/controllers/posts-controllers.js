@@ -1,22 +1,17 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-
 const HttpError = require('../models/http-error');
 const User = require('../models/user');
 const Post = require('../models/post');
-const Comment = require('../models/comment');
 
 const createPost = async(req, res, next) => {
     let creator, createdPost;
-    creator = await User.findById(req.userData.userId).populate('posts');
-
-    createdPost = new Post({
-        creator,
-        image: req.file.path,
-        likers: [],
-        comments: []
-    });
     try {
+        creator = await User.findById(req.userData.userId);
+        createdPost = new Post({
+            creator,
+            image: req.file.path,
+            likers: [],
+            comments: []
+        });
         await createdPost.save();
         creator.posts.push(createdPost);
         await creator.save();
@@ -27,45 +22,43 @@ const createPost = async(req, res, next) => {
         );
         return next(error);
     }
-
-    res.status(201).json({ message: "Post Created" });
+    res.status(201).json({
+        message: "Post Created",
+        imgLink: req.file.path
+    });
 };
 
 const getAllPosts = async(req, res, next) => {
     let allPosts;
-    allPosts = await Post.find({}).populate('creator').populate('comments').exec();
-    res.status(201).json({ posts: allPosts });
+    try {
+        allPosts = await Post.find({}).limit(10).populate('creator');
+        res.status(201).json(allPosts);
+    } catch(e) {
+        const error = new HttpError(
+            'Fetching places failed, please try again.',
+            500
+        );
+        return next(error);
+    }
 };
 
 const changeLikeStatus = async(req, res, next) => {
-    console.log("Hello");
-    console.log(req.body);
     const myId = req.userData.userId;
-    const postId = req.body.pid;
-    console.log(myId);
-    console.log(postId);
+    const { pid, decision } = req.body.pid;
     let user, post;
     try {
         user = await User.findById(myId);
-        post = await Post.findById(postId);
-        console.log(user);
-        console.log(post);
+        post = await Post.findById(pid);
         if (!user || !post) {
-            const error = new HttpError(
-                'Could not find given friend user for the provided id.',
-                404
-            );
+            const error = new HttpError('Could not find given user or post for the provided ids.', 404);
             return next(error);
         }
-        const val = post.likers.find(
-            (tFriend) => tFriend.toString() === myId.toString());
-
-        console.log(val);
-        if (val && val.toString().length > 0) {
+        const isLiked = post.likers.find(id => id === myId);
+        if (decision==="unlike" && isLiked) {
             post.likers.pull(user);
             await post.save();
             res.status(200).json({ val: "Removed Like" });
-        } else {
+        } else if(decision==="like" && !isLiked){
             post.likers.push(user);
             await post.save();
             res.status(200).json({ val: "Added Like" });
@@ -79,6 +72,35 @@ const changeLikeStatus = async(req, res, next) => {
     }
 };
 
+const addCommentToPost = async() => {
+    const myId = req.userData.userId;
+    const { pid, message } = req.body.pid;
+    let user, post, createdComment;
+    try {
+        user = await User.findById(myId);
+        post = await Post.findById(pid);
+        
+        if (!user || !post) {
+            const error = new HttpError(
+                'Could not find given user or post for the provided id.',
+                404
+            );
+            return next(error);
+        }
+
+        post.comments.push({ message, user });
+        await post.save();
+        res.json({ created: true });
+    } catch (err) {
+        const error = new HttpError(
+            'Something went wrong, could not add comment.',
+            500
+        );
+        return next(error);
+    }
+};
+
 exports.createPost = createPost;
 exports.getAllPosts = getAllPosts;
 exports.changeLikeStatus = changeLikeStatus;
+exports.addCommentToPost = addCommentToPost;
