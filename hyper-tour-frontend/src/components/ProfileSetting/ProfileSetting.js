@@ -42,6 +42,8 @@ const ProfileSetting = (props) => {
 
     const previousPasswordHandler = (e) => {
         setInpPrevPass(e.target.value);
+        setErrorField(false);
+        setSuccessPassword(false);
     };
 
     const newPasswordHandler = (e) => {

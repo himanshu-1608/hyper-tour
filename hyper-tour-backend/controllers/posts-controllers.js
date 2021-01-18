@@ -1,12 +1,12 @@
 const HttpError = require('../models/http-error');
-const User = require('../models/user');
 const Post = require('../models/post');
+const { findUserById, createNewPost, findPostById } = require('../utils/db-utils');
 
 const createPost = async(req, res, next) => {
     let creator, createdPost;
     try {
-        creator = await User.findById(req.userData.userId);
-        createdPost = new Post({
+        creator = await findUserById(req.userData.userId);
+        createdPost = await createNewPost({
             creator,
             image: req.file.path,
             likers: [],
@@ -48,8 +48,8 @@ const changeLikeStatus = async(req, res, next) => {
     const { pid, decision } = req.body;
     let user, post;
     try {
-        user = await User.findById(myId);
-        post = await Post.findById(pid);
+        user = await findUserById(myId);
+        post = await findPostById(pid);
         if (!user || !post) {
             const error = new HttpError('Could not find given user or post for the provided ids.', 404);
             return next(error);
@@ -82,8 +82,8 @@ const addCommentToPost = async(req, res, next) => {
     const { pid, message } = req.body;
     let user, post;
     try {
-        user = await User.findById(myId);
-        post = await Post.findById(pid);
+        user = await findUserById(myId);
+        post = await findPostById(pid);
         if (!user || !post) {
             const error = new HttpError(
                 'Could not find given user or post for the provided id.',

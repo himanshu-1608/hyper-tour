@@ -1,30 +1,16 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const {secret, times} = require('../config');
+const {times} = require('../config');
 const HttpError = require('../models/http-error');
-const User = require('../models/user');
+const {findUserByName, findUserById, getLimitedUsers} = require('../utils/db-utils');
 
 const getUser = async(req, res, next) => {
     const userName = req.params.uname;
     let user;
     try {
-        user = await User.findOne({ name: userName });
+        user = await findUserByName(userName);
     } catch (err) {
-        const error = new HttpError(
-            'Something went wrong, server error.',
-            500
-        );
-        return next(error);
+        return next(err);
     }
-
-    if (!user) {
-        const error = new HttpError(
-            'Could not find user for the provided id.',
-            404
-        );
-        return next(error);
-    }
-
     res.status(200).json({
         user: user.toObject({ getters: true }),
         myId: req.userData.userId
@@ -36,14 +22,10 @@ const changeFollowingStatus = async(req, res, next) => {
     const { friendId, decision } = req.body;
     let user, friend;
     try {
-        user = await User.findById(myId);
-        friend = await User.findById(friendId);
+        user = await findUserById(myId);
+        friend = await findUserById(friendId);
     } catch (err) {
-        const error = new HttpError(
-            'Something went wrong, could not find the user.',
-            500
-        );
-        return next(error);
+        return next(err);
     }
 
     if (!user || !friend) {
@@ -51,7 +33,8 @@ const changeFollowingStatus = async(req, res, next) => {
         return next(error);
     }
 
-    const isFriend = user.following.find(followingId => followingId == friendId);
+    const isFriend = user.following.find(
+        followingId => followingId == friendId);
 
     try {
         if (decision === "add") {
@@ -85,7 +68,7 @@ const checkFollowingStatus = async(req, res, next) => {
     const { friendId } = req.body;
     let user;
     try {
-        user = await User.findById(myId);
+        user = await findUserById(myId);
     } catch (err) {
         const error = new HttpError(
             'Something went wrong, could not find the user.',
@@ -115,9 +98,8 @@ const getSuggestions = async(req, res, next) => {
     const myId = req.userData.userId;
     let user, allList;
     try {
-        user = await User.findById(myId);
-        allList = await User.find().limit(20);
-        
+        user = await findUserById(myId);
+        allList = await getLimitedUsers(20);
         if (!user || !allList) {
             const error = new HttpError(
                 'Could not find given user or suggestions for the provided id.',
@@ -134,7 +116,7 @@ const getSuggestions = async(req, res, next) => {
         res.status(200).json(suggestions);
     } catch (err) {
         const error = new HttpError(
-            'Something went wrong, could not find the user.',
+            'Something went wrong, could not find the suggestions.',
             500
         );
         return next(error);
@@ -144,8 +126,8 @@ const getSuggestions = async(req, res, next) => {
 const updateImage = async(req, res, next) => {
     let user;
     try {
-        user = await User.findById(req.userData.userId);
-        user.image = req.file.path
+        user = await findUserById(req.userData.userId);
+        user.image = req.file.path;
         await user.save();
         res.status(201).json({message: "Image Updated"});
     } catch (err) {
@@ -162,7 +144,7 @@ const updatePassword = async(req, res, next) => {
     const { oldPassword, newPassword } = req.body;
     let isValidPassword;
     try {
-        user = await User.findById(req.userData.userId);
+        user = await findUserById(req.userData.userId);
         isValidPassword = await bcrypt.compare(
             oldPassword, user.password);
     } catch (err) {

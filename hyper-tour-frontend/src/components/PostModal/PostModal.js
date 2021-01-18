@@ -70,15 +70,6 @@ const PostModal = (props) =>{
             }
         }
         getPost();
-        // let commentArray = [];
-        // for(let i=1;i<10;i++) {
-        //     commentArray.push(
-        //     <div  key={i}>
-        //         <strong>user {i}</strong>
-        //         <div>Hello friends, chai pi lo... garam hai</div>
-        //     </div>);
-        // }
-        // setComments(commentArray);
     },[commentAdded]);
 
     return (
@@ -87,7 +78,7 @@ const PostModal = (props) =>{
                 <span onClick={props.closeModal} className="close right">&times;</span>
                 <div className="row">
                     <div className="col l1 center-align">
-                        <img className="circle" src={authorImg} width="52px" alt="post-creator" />
+                        <img className="circle" src={`http://localhost:5000/${authorImg}`} width="52px" alt="post-creator" />
                     </div>
                     <div className="col l6">
                         <h5 id="modal-post-creator">{author}</h5>

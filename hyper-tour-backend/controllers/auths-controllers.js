@@ -1,16 +1,15 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {secret, times} = require('../config');
-
+const {findUserByEmail, createNewUser} = require('../utils/db-utils');
 const HttpError = require('../models/http-error');
-const User = require('../models/user');
 
 const signup = async(req, res, next) => {
     
     const { name, email, password } = req.body;
     let existingUser;
     try {
-        existingUser = await User.findOne({ email: email });
+        existingUser = await findUserByEmail(email);
     } catch (err) {
         const error = new HttpError(
             'Signing up failed, please try again later.',
@@ -38,7 +37,7 @@ const signup = async(req, res, next) => {
         return next(error);
     }
 
-    const createdUser = new User({
+    const createdUser = await createNewUser({
         name,
         email,
         password: hashedPassword,
@@ -47,7 +46,7 @@ const signup = async(req, res, next) => {
         followers: [],
         posts: []
     });
-
+    
     try {
         await createdUser.save();
     } catch (err) {
@@ -71,7 +70,6 @@ const signup = async(req, res, next) => {
         );
         return next(error);
     }
-
     res.status(201).json({
             userId: createdUser.id,
             email: createdUser.email,
@@ -86,7 +84,7 @@ const login = async(req, res, next) => {
 
     let existingUser;
     try {
-        existingUser = await User.findOne({ email: email });
+        existingUser = await findUserByEmail(email);
     } catch (err) {
         const error = new HttpError(
             'Logging in failed, please try again later.',
