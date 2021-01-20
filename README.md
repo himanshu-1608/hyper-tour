@@ -1,3 +1,3 @@
 # hyper-tour
 
-It is a social website designed as an assignment
+Social website for competing with Facebook :p (JK)
